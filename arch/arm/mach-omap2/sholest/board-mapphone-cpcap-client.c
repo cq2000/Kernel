@@ -13,11 +13,11 @@
 #include <linux/irq.h>
 #include <linux/platform_device.h>
 #include <linux/spi/cpcap.h>
-#include "include/leds-ld-cpcap.h"
-#include "include/leds-ld-cpcap-disp.h"
-#include "include//leds-cpcap-kpad.h"
-#include "include/leds-cpcap-display.h"
-#include "include/leds-cpcap-button.h"
+#include <linux/leds-ld-cpcap.h>
+#include <linux/leds-ld-cpcap-disp.h>
+#include <linux/leds-cpcap-kpad.h>
+#include <linux/leds-cpcap-display.h>
+#include <linux/leds-cpcap-button.h>
 #include <mach/gpio.h>
 #include <plat/mux.h>
 #include <plat/resource.h>
