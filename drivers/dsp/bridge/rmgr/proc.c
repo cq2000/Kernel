@@ -754,17 +754,19 @@ static DSP_STATUS proc_memory_sync(DSP_HPROCESSOR hProcessor, void *pMpuAddr,
 	}
 #endif /* CONFIG_BRIDGE_CHECK_ALIGN_128 */
 
-	if (ulFlags == 3)
-		__cpuc_flush_kern_all();
-	else {
-		down_read(&current->mm->mmap_sem);
-		if (memory_sync_vma((u32)pMpuAddr, ulSize, ulFlags)) {
-				pr_err("%s: InValid address parameters %p %x\n",
-				__func__, pMpuAddr, ulSize);
-				status = DSP_EHANDLE;
-		}
-		up_read(&current->mm->mmap_sem);
+	if (!MEM_IsValidHandle(pProcObject, PROC_SIGNATURE)) {
+		status = DSP_EHANDLE;
 	}
+
+	down_read(&current->mm->mmap_sem);
+
+	if (memory_sync_vma((u32)pMpuAddr, ulSize, ulFlags)) {
+		pr_err("%s: InValid address parameters %p %x\n",
+		       __func__, pMpuAddr, ulSize);
+		status = DSP_EHANDLE;
+	}
+
+	up_read(&current->mm->mmap_sem);
 
 	return status;
 }
@@ -1716,11 +1718,7 @@ DSP_STATUS PROC_Stop(DSP_HPROCESSOR hProcessor)
 			GT_1trace(PROC_DebugMask, GT_7CLASS,
 				 "Can't stop device, Active "
 				 "nodes = 0x%x \n", uNodesAllocated);
-			if (uBrdState == BRD_ERROR)
-				printk(KERN_INFO "%s: in error, ignoring"
-					" active nodes\n", __func__);
-			else
-				return DSP_EWRONGSTATE;
+			return DSP_EWRONGSTATE;
 		}
 	}
 	/* Call the WMD_BRD_Stop */

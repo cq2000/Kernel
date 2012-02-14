@@ -619,5 +619,4 @@
 					    OUT struct DSP_NDBPROPS
 					    *pNodeProps);
 
-    extern void clear_loadref_ndlr(struct NLDR_OBJECT *pNldr);
 #endif				/* NODE_ */

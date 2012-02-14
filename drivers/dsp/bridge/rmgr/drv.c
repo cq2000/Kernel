@@ -280,11 +280,9 @@ static DSP_STATUS DRV_ProcFreeNodeRes(HANDLE hPCtxt)
 					"the status after the NodeDelete %x\n",
 					status);
 				} else if ((nState == NODE_ALLOCATED)
-					|| (nState == NODE_CREATED)
-					|| (nState == NODE_DELETING)) {
+					|| (nState == NODE_CREATED))
 					status = NODE_Delete(pNodeRes->hNode,
 							pCtxt);
-				}
 			}
 		}
 	}
@@ -388,7 +386,6 @@ DSP_STATUS  DRV_ProcFreeDMMRes(HANDLE hPCtxt)
 	DSP_STATUS status = DSP_SOK;
 	struct DMM_RES_OBJECT *pDMMList;
 	struct DMM_RES_OBJECT *pDMMRes = NULL;
-	void *addr = NULL;
 
 	DBC_Assert(hPCtxt != NULL);
 	GT_0trace(curTrace, GT_ENTER, "\nDRV_ProcFreeDMMRes: 1\n");
@@ -396,12 +393,12 @@ DSP_STATUS  DRV_ProcFreeDMMRes(HANDLE hPCtxt)
 	while (pDMMList != NULL) {
 		pDMMRes = pDMMList;
 		pDMMList = pDMMList->next;
-		addr = (void *)pDMMRes->ulDSPResAddr;
 		if (pDMMRes->dmmAllocated) {
 			status = PROC_UnMap(pDMMRes->hProcessor,
 				 (void *)pDMMRes->ulDSPAddr, pCtxt);
-			status = PROC_UnReserveMemory(pCtxt->hProcessor,
-				 (void *)addr);
+			status = PROC_UnReserveMemory(pDMMRes->hProcessor,
+				 (void *)pDMMRes->ulDSPResAddr);
+			pDMMRes->dmmAllocated = 0;
 		}
 	}
 	return status;
@@ -413,9 +410,17 @@ DSP_STATUS DRV_RemoveAllDMMResElements(HANDLE hPCtxt)
 {
 	struct PROCESS_CONTEXT *pCtxt = (struct PROCESS_CONTEXT *)hPCtxt;
 	DSP_STATUS status = DSP_SOK;
+	struct DMM_RES_OBJECT *pTempDMMRes2 = NULL;
+	struct DMM_RES_OBJECT *pTempDMMRes = NULL;
 
 	DBC_Assert(pCtxt != NULL);
 	DRV_ProcFreeDMMRes(pCtxt);
+	pTempDMMRes = pCtxt->pDMMList;
+	while (pTempDMMRes != NULL) {
+		pTempDMMRes2 = pTempDMMRes;
+		pTempDMMRes = pTempDMMRes->next;
+		MEM_Free(pTempDMMRes2);
+	}
 	pCtxt->pDMMList = NULL;
 	return status;
 }

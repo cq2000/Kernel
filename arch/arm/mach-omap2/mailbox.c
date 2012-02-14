@@ -412,8 +412,8 @@ static int __devinit omap2_mbox_probe(struct platform_device *pdev)
 		mbox_1_info.irq = res->start;
 		ret = omap_mbox_register(&pdev->dev, &mbox_1_info);
 	} else {
-		mbox_wrigley_info.irq = res->start;
-		ret = omap_mbox_register(&pdev->dev, &mbox_wrigley_info);
+		mbox_dsp_info.irq = res->start;
+		ret = omap_mbox_register(&pdev->dev, &mbox_dsp_info);
 	}
 	if (ret)
 		goto err_dsp;
@@ -460,9 +460,8 @@ static int __devexit omap2_mbox_remove(struct platform_device *pdev)
 	if (cpu_is_omap44xx()) {
 		omap_mbox_unregister(&mbox_2_info);
 		omap_mbox_unregister(&mbox_1_info);
-	} else {
-		omap_mbox_unregister(&mbox_wrigley_info);
-	}
+	} else
+		omap_mbox_unregister(&mbox_dsp_info);
 	iounmap(mbox_base);
 	return 0;
 }

@@ -78,6 +78,4 @@
 	extern DSP_STATUS NLDR_Unload(struct NLDR_NODEOBJECT *hNldrNode,
 				    enum NLDR_PHASE phase);
 
-    extern void clear_loadref_dbll(struct DBLL_LibraryObj *lib);
-
 #endif				/* NLDR_ */
