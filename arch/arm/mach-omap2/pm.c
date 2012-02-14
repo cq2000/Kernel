@@ -48,7 +48,9 @@ static int vdd2_locked;
 static ssize_t vdd_opp_show(struct kobject *kobj, struct kobj_attribute *attr,
 			 char *buf)
 {
-	if (attr == &vdd1_opp_attr)
+	if (attr == &vdd1_max_attr)
+		return sprintf(buf, "%u\n", vdd1_max_level);
+	else if (attr == &vdd1_opp_attr)
 		return sprintf(buf, "%hu\n", resource_get_level("vdd1_opp"));
 	else if (attr == &vdd2_opp_attr)
 		return sprintf(buf, "%hu\n", resource_get_level("vdd2_opp"));
@@ -110,6 +112,9 @@ static ssize_t vdd_opp_store(struct kobject *kobj, struct kobj_attribute *attr,
 			return -EINVAL;
 		}
 		resource_set_opp_level(VDD2_OPP, value, flags);
+	} else if (attr == &vdd1_max_attr) {
+		omap_pm_vdd1_set_max_opp(value);
+		vdd1_max_level = value;
 	} else {
 		return -EINVAL;
 	}
